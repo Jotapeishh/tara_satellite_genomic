@@ -1,13 +1,7 @@
 import os
-
 import pandas as pd
-import numpy as np
-
-import matplotlib.pyplot as plt
-
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
-
 
 input_dir = '../01_biological_data'
 output_dir = '../../out_results/out_genomic_clusters'
@@ -15,17 +9,19 @@ os.makedirs(output_dir, exist_ok=True)
 
 # Read matrices of interest
 files = os.listdir(input_dir)
-matrix_files = [f for f in files if f.startswith('Matrix_world_GEN_') and f.endswith('.tsv')]
+matrix_files = sorted([f for f in files if f.startswith('Matrix_world_GEN_') and f.endswith('.tsv')])
 
 # Define function to vary parameters and calculate metrics
 all_metrics_results = []
+clustering_results_dict = {}
+
 def perform_kmeans_clustering(file_path, n_clusters_list):
     matrix = pd.read_csv(file_path, sep='\t', index_col=0)
     base_filename = os.path.splitext(os.path.basename(file_path))[0]
     
     # Extract the matrix type and subsample
     matrix_type_subsample = "_".join(base_filename.split('_')[3:])
-
+    
     # Perform K-Means for different 'n'
     for n_clusters in n_clusters_list:
         kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init=50)
@@ -48,13 +44,14 @@ def perform_kmeans_clustering(file_path, n_clusters_list):
             'calinski_harabasz_score': calinski_harabasz
         })
         
-        results = pd.DataFrame({
-            'Sample': matrix.index,
-            'Cluster': cluster_labels
-        })
+        # Create a DataFrame for the cluster labels with appropriate column names
+        col_name = f"{matrix_type_subsample}_kmeans_{n_clusters}"
+        results = pd.DataFrame({col_name: cluster_labels}, index=matrix.index)
         
-        output_filename = f'KMeans{n_clusters}_{base_filename}.tsv'
-        results.to_csv(os.path.join(output_dir, output_filename), sep='\t', index=False)
+        if col_name not in clustering_results_dict:
+            clustering_results_dict[col_name] = results
+        else:
+            clustering_results_dict[col_name] = pd.concat([clustering_results_dict[col_name], results], axis=1)
 
 # Perform K-Means for different n-clusters for each matrix
 n_clusters_list = [3, 4, 5, 6, 7, 8]
@@ -62,9 +59,15 @@ for matrix_file in matrix_files:
     file_path = os.path.join(input_dir, matrix_file)
     perform_kmeans_clustering(file_path, n_clusters_list)
 
-# Save metrics
+# Combine all clustering results into one DataFrame
+combined_clustering_results = pd.concat(clustering_results_dict.values(), axis=1)
+
+# Save the combined clustering results to a single .tsv file
+output_filename = 'kmeans_results.tsv'
+combined_clustering_results.to_csv(os.path.join(output_dir, output_filename), sep='\t', index=True)
+
 metrics_df = pd.DataFrame(all_metrics_results)
-metrics_output_filename = 'All_Matrices_KMeans_metrics.tsv'
+metrics_output_filename = 'kmeans_metrics.tsv'
 metrics_df.to_csv(os.path.join(output_dir, metrics_output_filename), sep='\t', index=False)
 
 # Plot metrics for each matrix
@@ -104,6 +107,6 @@ for matrix_type_subsample in unique_matrices:
     plt.title(f'Evaluation Metrics for {matrix_type_subsample}')
 
     # Save the plot
-    plot_filename = f'KMeans_metrics_{matrix_type_subsample}.pdf'
+    plot_filename = f'kmeans_metrics_{matrix_type_subsample}.pdf'
     plt.savefig(os.path.join(output_dir, plot_filename), bbox_inches='tight')
     plt.close()
