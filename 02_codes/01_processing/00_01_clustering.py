@@ -32,7 +32,7 @@ def clr_(data, eps=1e-6):
     return clr_data
 
 input_dir = '../../01_data/01_biological_data'
-output_dir = '../../03_out_results/out_genomic_clusters'
+output_dir = '../../03_results/out_genomic_clusters'
 os.makedirs(output_dir, exist_ok=True)
 
 # Read matrices of interest and sort them alphabetically
