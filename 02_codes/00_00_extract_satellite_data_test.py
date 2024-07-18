@@ -15,19 +15,18 @@ import time
 
 file_path = '../01_data/01_biological_data'
 file_name = 'metadata.tsv'
-
 sat_data_path = '../01_data/00_satellite_data'
+
+output_dir = '../01_data/02_satellite_data_processed'
+os.makedirs(output_dir, exist_ok=True)
 
 file = os.path.join(file_path, file_name)
 md = pd.read_csv(file, sep='\t', index_col=0)
 
 md_srf = md[md.Layer == 'SRF'].copy()
-
 md_srf['Event.date.YYYYMM'] = md_srf['Event.date'].str[:7].str.replace('-', '')
 md_srf['Event.date.YYYYMM01'] = md_srf['Event.date'].str[:7].str.replace('-', '')+'01'
-#print(md_srf[['Event.date', 'Event.date.YYYYMM', 'Event.date.YYYYMM01']])
 
-sat_data_path = '../01_data/00_satellite_data'
 satellite_features = [
     'CHL.chlor_a', 'FLH.nflh', 'KD.Kd_490', 'PAR.par', 'PIC.pic', 'POC.poc',
     'RRS.Rrs_412', 'RRS.Rrs_443', 'RRS.Rrs_469', 'RRS.Rrs_488', 'RRS.Rrs_531',
@@ -44,7 +43,7 @@ def find_satellite_file(directory, pattern):
             return os.path.join(directory, file)
     return None
 
-def select_n_nearest_valid(ds, feature, latitude, longitude, n=5):
+def select_n_nearest_valid(ds, feature, latitude, longitude, n):
     latitudes = ds['lat'].values
     longitudes = ds['lon'].values
     
@@ -70,6 +69,7 @@ def select_n_nearest_valid(ds, feature, latitude, longitude, n=5):
 
 start_time = time.time()
 
+n_adj_points = 9
 for index, row in md_srf.iterrows():
     latitude = row['Latitude']
     longitude = row['Longitude']
@@ -89,14 +89,17 @@ for index, row in md_srf.iterrows():
             try:
                 variable_name = feature.split('.')[1]
                 
-                data_point_terra = select_n_nearest_valid(ds_terra, variable_name, latitude, longitude, n=9)
+                data_point_terra = select_n_nearest_valid(ds_terra, variable_name, latitude, longitude, n_adj_points)
                 satellite_data_terra.at[index, feature] = data_point_terra
 
-                data_point_aqua = select_n_nearest_valid(ds_aqua, variable_name, latitude, longitude, n=9)
+                data_point_aqua = select_n_nearest_valid(ds_aqua, variable_name, latitude, longitude, n_adj_points)
                 satellite_data_aqua.at[index, feature] = data_point_aqua
 
             except KeyError:
                 print(f"Feature {feature} not found in dataset")
+            finally:
+                ds_terra.close()
+                ds_aqua.close()
         else:
             if not file_path_terra:
                 print(f"No TERRA file found for pattern: {pattern_terra}")
@@ -113,6 +116,5 @@ print(satellite_data_avg.isna().sum())
 
 print(f"Tiempo de ejecución: {execution_time:.2f} segundos")
 
-output_path = '../../'
-
-satellite_data_avg.to_csv('matrix_tara_old_adj_grids_09.tsv', sep='\t')
+output_path = os.path.join(output_dir, f'matrix_tara_old_adj_grids_{n_adj_points}.tsv')
+satellite_data_avg.to_csv(output_path, sep='\t')
