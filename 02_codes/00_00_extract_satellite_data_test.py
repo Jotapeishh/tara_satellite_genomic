@@ -13,6 +13,15 @@ from glob import glob
 
 import time
 
+import sys
+
+if len(sys.argv) != 2:
+    print("Usage: python your_script_name.py <n_adj_points>")
+    sys.exit(1)
+
+# Convertir el argumento a un entero
+n_adj_points = int(sys.argv[1])
+
 file_path = '../01_data/01_biological_data'
 file_name = 'metadata.tsv'
 sat_data_path = '../01_data/00_satellite_data'
@@ -69,7 +78,6 @@ def select_n_nearest_valid(ds, feature, latitude, longitude, n):
 
 start_time = time.time()
 
-n_adj_points = 9
 for index, row in md_srf.iterrows():
     latitude = row['Latitude']
     longitude = row['Longitude']
