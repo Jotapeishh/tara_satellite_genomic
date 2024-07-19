@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=Download
+#SBATCH --job-name=ExtractSatData
 #SBATCH --partition=general
 #SBATCH --output=logs/extract_sat.%a.%N.%j.out
 #SBATCH --error=logs/extract_sat.%a.%N.%j.err
