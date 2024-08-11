@@ -14,7 +14,14 @@ from sklearn.preprocessing import LabelEncoder
 from imblearn.over_sampling import SMOTE
 
 input_sat_dir = '../01_data/02_satellite_data_processed'
-predictor_files = sorted(glob(os.path.join(input_sat_dir, 'matrix_tara_world_adj_grids_*.tsv')))
+
+desired_files = ['matrix_tara_world_adj_grids_01.tsv', 
+                 'matrix_tara_world_adj_grids_09.tsv', 
+                 'matrix_tara_world_adj_grids_25.tsv', 
+                 'matrix_tara_world_adj_grids_49.tsv']
+
+predictor_files = sorted([f for f in glob(os.path.join(input_sat_dir, 'matrix_tara_world_adj_grids_*.tsv')) 
+                          if os.path.basename(f) in desired_files])
 
 
 input_kmeans_dir = '../03_results/out_genomic_clusters'
