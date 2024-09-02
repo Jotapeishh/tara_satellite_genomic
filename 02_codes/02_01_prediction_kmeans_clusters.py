@@ -61,11 +61,15 @@ for file in predictor_files:
     df = pd.read_csv(file, sep='\t', index_col=0)
     
     # Alinear los predictores con las muestras de target_vars
-    aligned_predictor = df.loc[df.index.intersection(target_vars.index)]
+    aligned_predictor = df.loc[df.index.intersection(target_vars.index)] # satellite
     
     for target_column in target_vars.columns:
         X = aligned_predictor
         y = target_vars.loc[aligned_predictor.index, target_column]
+
+        non_nan_indices = y.dropna().index
+        X = X.loc[non_nan_indices]
+        y = y.loc[non_nan_indices]
 
         y_encoded = le.fit_transform(y)
 
