@@ -37,9 +37,15 @@ md_srf['Event.date.YYYYMM'] = md_srf['Event.date'].str[:7].str.replace('-', '')
 md_srf['Event.date.YYYYMM01'] = md_srf['Event.date'].str[:7].str.replace('-', '')+'01'
 
 satellite_features = [
-    'CHL.chlor_a', 'FLH.nflh', 'KD.Kd_490', 'PAR.par', 'PIC.pic', 'POC.poc',
-    'RRS.Rrs_412', 'RRS.Rrs_443', 'RRS.Rrs_469', 'RRS.Rrs_488', 'RRS.Rrs_531',
-    'RRS.Rrs_547', 'RRS.Rrs_555', 'RRS.Rrs_645', 'RRS.Rrs_667', 'RRS.Rrs_678', 'SST.sst'
+    'CHL.chlor_a', 'FLH.nflh', 'FLH.ipar', 'IOP.adg_unc_443', 'IOP.adg_443',
+    'IOP.aph_unc_443', 'IOP.aph_44', 'IOP.bbp_s', 'IOP.adg_s', 'bbp_unc_443', 
+    'IOP.bbp_443', 'IOP.a_412', 'IOP.a_443', 'IOP.a_469', 'IOP.a_488', 'IOP.a_531', 
+    'IOP.a_547', 'IOP.a_555', 'IOP.a_645', 'IOP.a_667', 'IOP.a_678', 'IOP.bb_412', 
+    'IOP.bb_443', 'IOP.bb_469', 'IOP.bb_488', 'IOP.bb_531', 'IOP.bb_547', 'IOP.bb_555', 
+    'IOP.bb_645', 'IOP.bb_667', 'IOP.bb_678', 'KD.Kd_490', 'NSST.sst', 'PAR.par', 
+    'PIC.pic', 'POC.poc', 'RRS.aot_869', 'RRS.angstrom', 'RRS.Rrs_412', 'RRS.Rrs_443', 
+    'RRS.Rrs_469', 'RRS.Rrs_488', 'RRS.Rrs_531', 'RRS.Rrs_547', 'RRS.Rrs_555', 
+    'RRS.Rrs_645', 'RRS.Rrs_667', 'RRS.Rrs_678', 'SST.sst'
 ]
 
 satellite_data_terra = pd.DataFrame(index=md_srf.index, columns=satellite_features)
