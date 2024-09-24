@@ -130,5 +130,5 @@ print(satellite_data_avg.isna().sum())
 
 print(f"Tiempo de ejecución: {execution_time:.2f} segundos")
 
-output_path = os.path.join(output_dir, f'matrix_tara_world_adj_grids_{n_adj_points}.tsv')
+output_path = os.path.join(output_dir, f'matrix_tara_world_adj_grids_{str(n_adj_points).zfill(2)}.tsv')
 satellite_data_avg.to_csv(output_path, sep='\t')
