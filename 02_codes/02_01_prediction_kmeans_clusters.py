@@ -15,10 +15,12 @@ from imblearn.over_sampling import SMOTE
 
 input_sat_dir = '../01_data/02_satellite_data_processed'
 
-desired_files = ['matrix_tara_world_adj_grids_01.tsv', 
-                 'matrix_tara_world_adj_grids_09.tsv', 
-                 'matrix_tara_world_adj_grids_25.tsv', 
-                 'matrix_tara_world_adj_grids_49.tsv']
+desired_files = [
+#'matrix_tara_world_adj_grids_01.tsv',
+#'matrix_tara_world_adj_grids_09.tsv', 
+'matrix_tara_world_adj_grids_25.tsv', # In this case of study we will only use 25 adjacent grids
+#'matrix_tara_world_adj_grids_49.tsv'
+]
 
 predictor_files = sorted([f for f in glob(os.path.join(input_sat_dir, 'matrix_tara_world_adj_grids_*.tsv')) 
                           if os.path.basename(f) in desired_files])
@@ -54,16 +56,16 @@ scoring = {
 }
 
 for file in predictor_files:
-    # Nombre del archivo como identificador
     file_name = os.path.basename(file)
-    
-    # Cargar el predictor
     df = pd.read_csv(file, sep='\t', index_col=0)
-    
-    # Alinear los predictores con las muestras de target_vars
+
     aligned_predictor = df.loc[df.index.intersection(target_vars.index)] # satellite
     
-    for target_column in target_vars.columns:
+    desired_clusters = {'5', '6', '7', '8'} # only consider this number of clusters
+    columns_to_use = [col for col in target_vars.columns 
+    if col.startswith('clr_') and col.split('_')[-1] in desired_clusters] # only consider clr-abundance clusters
+
+    for target_column in columns_to_use:
         X = aligned_predictor
         y = target_vars.loc[aligned_predictor.index, target_column]
 
