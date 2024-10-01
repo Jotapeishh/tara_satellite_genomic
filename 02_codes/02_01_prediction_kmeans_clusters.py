@@ -34,7 +34,10 @@ target_vars = pd.read_csv(target_vars_path, sep='\t', index_col=0)
 target_vars = target_vars.map(lambda x: f"C{x}")
 #target_vars.head()
 
-results_df = pd.DataFrame(index=[os.path.basename(file) for file in predictor_files], columns=target_vars.columns)
+desired_clusters = {'5', '6', '7', '8'} # only consider this number of clusters
+columns_to_use = [col for col in target_vars.columns if col.startswith('clr_') and col.split('_')[-1] in desired_clusters] # only consider clr-abundance clusters
+
+results_df = pd.DataFrame(index=[os.path.basename(file) for file in predictor_files], columns=columns_to_use)
 
 def calculate_metrics(y_true, y_pred):
     accuracy = accuracy_score(y_true, y_pred)
@@ -60,10 +63,6 @@ for file in predictor_files:
     df = pd.read_csv(file, sep='\t', index_col=0)
 
     aligned_predictor = df.loc[df.index.intersection(target_vars.index)] # satellite
-    
-    desired_clusters = {'5', '6', '7', '8'} # only consider this number of clusters
-    columns_to_use = [col for col in target_vars.columns 
-    if col.startswith('clr_') and col.split('_')[-1] in desired_clusters] # only consider clr-abundance clusters
 
     for target_column in columns_to_use:
         X = aligned_predictor
