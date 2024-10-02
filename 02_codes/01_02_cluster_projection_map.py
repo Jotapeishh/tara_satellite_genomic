@@ -25,25 +25,29 @@ for col in clusters.columns:
     clusters[col] = clusters[col].astype('Int64')
 md = pd.read_csv(md_path, sep='\t', index_col=0)
 
-merged_data = clusters.join(md[['Latitude', 'Longitude', 'NPP 8d VGPM (mgC/m2/day)', 'Mean Flux at 150m', 'Temperature']])
+merged_data = clusters.join(md[['Latitude', 'Longitude', 'NPP 8d VGPM (mgC/m2/day)', 'Mean Flux at 150m', 'Temperature', 'ChlorophyllA', 'Fluorescence']])
 
 def plot_clusters_on_map(merged_data, cluster_column):
     filtered_data = merged_data[~merged_data[cluster_column].isna()] # filter out rows where cluster_column is NaN
     
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 12), subplot_kw={'projection': ccrs.PlateCarree()})
+    fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(20, 18), subplot_kw={'projection': ccrs.PlateCarree()})
     axes = axes.flatten()  # flatten the array of axes for easy iteration
     
     plot_titles = [
         f'Clusters Projection: {cluster_column}',
         'NPP 8d VGPM (mgC/m2/day)',
         'Mean Flux at 150m',
-        'Temperature'
+        'Temperature',
+        'ChlorophyllA',
+        'Fluorescence'
     ]
     data_columns = [
         cluster_column,
         'NPP 8d VGPM (mgC/m2/day)',
         'Mean Flux at 150m',
-        'Temperature'
+        'Temperature',
+        'ChlorophyllA',
+        'Fluorescence'
     ]
     
     unique_clusters = filtered_data[cluster_column].unique()
@@ -53,7 +57,7 @@ def plot_clusters_on_map(merged_data, cluster_column):
         marker_styles = (marker_styles * ((num_clusters // len(marker_styles)) + 1))[:num_clusters]
     cluster_marker_map = dict(zip(unique_clusters, marker_styles))
     
-    env_vars = ['NPP 8d VGPM (mgC/m2/day)', 'Mean Flux at 150m', 'Temperature']
+    env_vars = ['NPP 8d VGPM (mgC/m2/day)', 'Mean Flux at 150m', 'Temperature', 'ChlorophyllA', 'Fluorescence']
     norms = {}
     for data_column in env_vars:
         vmin = filtered_data[data_column].min()
@@ -83,7 +87,6 @@ def plot_clusters_on_map(merged_data, cluster_column):
                 )
             ax.legend(loc='upper left')
         else:
-            # Other subplots: Environmental variables with cluster markers
             norm = norms[data_column]
             for cluster_id in unique_clusters:
                 cluster_points = plot_data[plot_data[cluster_column] == cluster_id]
