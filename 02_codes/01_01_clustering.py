@@ -37,7 +37,8 @@ os.makedirs(output_dir, exist_ok=True)
 
 # Read matrices of interest and sort them alphabetically
 files = os.listdir(input_dir)
-matrix_files = sorted([f for f in files if f.startswith('Matrix_world_GEN_') and f.endswith('.tsv')])
+matrix_files = sorted([f for f in files if f.startswith('Matrix_chile_GEN_') and f.endswith('.tsv')])
+print(f"Matrixes read and sorted. Total: {len(matrix_files)}")
 
 all_metrics_results = []
 clustering_results_dict = {}
@@ -77,6 +78,7 @@ def perform_kmeans_clustering(matrix, matrix_type_subsample, n_clusters_list, cl
 # Perform K-Means for different n-clusters for each matrix
 n_clusters_list = [3, 4, 5, 6, 7, 8]
 for matrix_file in matrix_files:
+    print(f"performing k-means to {matrix_file}")
     file_path = os.path.join(input_dir, matrix_file)
     matrix = pd.read_csv(file_path, sep='\t', index_col=0)
     base_filename = os.path.splitext(os.path.basename(file_path))[0]
@@ -87,16 +89,18 @@ for matrix_file in matrix_files:
     clr_matrix = clr_(matrix)
     perform_kmeans_clustering(clr_matrix, matrix_type_subsample, n_clusters_list, clr=True)
 
+
+
 combined_clustering_results = pd.concat(clustering_results_dict.values(), axis=1)
 #combined_clustering_results = combined_clustering_results.sort_index(axis=1)
 
 # Results of the kmeans
-output_filename = 'kmeans_results.tsv'
+output_filename = 'kmeans_results_ch.tsv'
 combined_clustering_results.to_csv(os.path.join(output_dir, output_filename), sep='\t', index=True)
 
 # Results of the metrics of the kmeans clustering
 metrics_df = pd.DataFrame(all_metrics_results)
-metrics_output_filename = 'kmeans_metrics.tsv'
+metrics_output_filename = 'kmeans_metrics_ch.tsv'
 metrics_df.to_csv(os.path.join(output_dir, metrics_output_filename), sep='\t', index=False)
 
 # Plot metrics
@@ -136,6 +140,6 @@ for matrix_type_subsample in unique_matrices:
     plt.title(f'Evaluation Metrics for {matrix_type_subsample}')
 
     # Save the plot
-    plot_filename = f'kmeans_metrics_{matrix_type_subsample}.pdf'
+    plot_filename = f'kmeans_metrics_{matrix_type_subsample}_ch.pdf'
     plt.savefig(os.path.join(output_dir, plot_filename), bbox_inches='tight')
     plt.close()
