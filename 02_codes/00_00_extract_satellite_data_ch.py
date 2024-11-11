@@ -19,6 +19,18 @@ if len(sys.argv) != 2:
     print("Usage: python your_script_name.py <n_adj_points>")
     sys.exit(1)
 
+# Convertir el argumento a un entero
+n_adj_points = int(sys.argv[1])
+
+file_path = '../01_data/01_biological_data'
+file_name = 'metadata_chile.tsv'
+sat_data_path = '../01_data/00_satellite_data'
+
+output_dir = '../01_data/02_satellite_data_processed'
+os.makedirs(output_dir, exist_ok=True)
+
+file = f"{file_path}/{file_name}"
+md = pd.read_csv(file, sep='\t', index_col=0)
 
 def format_cleanup(datetime_str):
     date_str = datetime_str[:-6]
@@ -33,21 +45,12 @@ def format_cleanup(datetime_str):
     clean_date_str = datetime.strftime(date, '%Y%m')
     return clean_date_str
 
-# Convertir el argumento a un entero
-n_adj_points = int(sys.argv[1])
-
-file_path = '../01_data/01_biological_data'
-file_name = 'metadata_chile.tsv'
-sat_data_path = '../01_data/00_satellite_data'
-
-output_dir = '../01_data/02_satellite_data_processed'
-os.makedirs(output_dir, exist_ok=True)
-
-file = os.path.join(file_path, file_name)
-md = pd.read_csv(file, sep='\t', index_col=0)
-
 md_srf = md[md['Depth level'] == 'SRF'].copy()
+
 md_srf['date'] = md_srf['datetime'].apply(format_cleanup)
+
+md_srf['Event.date.YYYYMM'] = md_srf['Event.date'].str[:7].str.replace('-', '')
+md_srf['Event.date.YYYYMM01'] = md_srf['Event.date'].str[:7].str.replace('-', '')+'01'
 
 satellite_features = [
     'CHL.chlor_a', 'FLH.nflh', 'FLH.ipar', 'IOP.adg_unc_443', 'IOP.adg_443',
@@ -100,8 +103,8 @@ start_time = time.time()
 for index, row in md_srf.iterrows():
     latitude = row['lat_cast']
     longitude = row['lon_cast']
-    date = row['date']
-    print(index)
+    date = row['Event.date.YYYYMM']
+    
     for feature in satellite_features:
         resolution = '9km'
         
