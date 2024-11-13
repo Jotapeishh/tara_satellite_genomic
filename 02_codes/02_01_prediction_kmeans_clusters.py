@@ -11,14 +11,13 @@ from sklearn.model_selection import RepeatedStratifiedKFold, train_test_split, c
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score, make_scorer
 from sklearn.preprocessing import LabelEncoder
 
-from imblearn.over_sampling import SMOTE
 
 input_sat_dir = '../01_data/02_satellite_data_processed'
 
 desired_files = [
 #'matrix_tara_world_adj_grids_01.tsv',
 #'matrix_tara_world_adj_grids_09.tsv', 
-'matrix_tara_world_adj_grids_25.tsv', # In this case of study we will only use 25 adjacent grids
+'matrix_tara_chile_adj_grids_25.tsv', # In this case of study we will only use 25 adjacent grids
 #'matrix_tara_world_adj_grids_49.tsv'
 ]
 
@@ -27,7 +26,7 @@ predictor_files = sorted([f for f in glob(os.path.join(input_sat_dir, 'matrix_ta
 
 
 input_kmeans_dir = '../03_results/out_genomic_clusters'
-target_vars_filename = 'kmeans_results.tsv'
+target_vars_filename = 'kmeans_results_ch.tsv'
 target_vars_path = os.path.join(input_kmeans_dir, target_vars_filename)
 
 target_vars = pd.read_csv(target_vars_path, sep='\t', index_col=0)

@@ -15,8 +15,9 @@ USER_EMAIL="eljpss@gmail.com"
 PASSWORD="$WGET_PASSWORD"  # Ensure $WGET_PASSWORD is exported in your environment
 
 # Path to your dates file
-DATES_FILE="unique_dates_yyyymmdd_cc.tsv"
+DATES_FILE="unique_dates_yyyymmdd_ch.tsv"
 dos2unix $DATES_FILE
+echo $DATES_FILE
 
 
 # Read the dates into an array, skipping the header line
@@ -26,7 +27,13 @@ mapfile -t DATES < <(tail -n +2 "$DATES_FILE")
 
 # Define the features in an array
 FEATURES=(
-    "CHL.chlor_a" 
+    "CHL.chlor_a" "FLH.nflh" "FLH.ipar" "IOP.adg_unc_443" "IOP.adg_443" "IOP.aph_unc_443" "IOP.aph_443"
+    "IOP.bbp_s" "IOP.adg_s" "IOP.bbp_unc_443" "IOP.bbp_443" "IOP.a_412" "IOP.a_443" "IOP.a_469"
+    "IOP.a_488" "IOP.a_531" "IOP.a_547" "IOP.a_555" "IOP.a_645" "IOP.a_667" "IOP.a_678" "IOP.bb_412"
+    "IOP.bb_443" "IOP.bb_469" "IOP.bb_488" "IOP.bb_531" "IOP.bb_547" "IOP.bb_555" "IOP.bb_645"
+    "IOP.bb_667" "IOP.bb_678" "KD.Kd_490" "NSST.sst" "PAR.par" "PIC.pic" "POC.poc" "RRS.aot_869"
+    "RRS.angstrom" "RRS.Rrs_412" "RRS.Rrs_443" "RRS.Rrs_469" "RRS.Rrs_488" "RRS.Rrs_531" "RRS.Rrs_547"
+    "RRS.Rrs_555" "RRS.Rrs_645" "RRS.Rrs_667" "RRS.Rrs_678" "SST.sst"
 )
 
 # Set the resolution (e.g., '9km')
@@ -46,12 +53,12 @@ for DATE in "${DATES[@]}"; do
     for FEATURE in "${FEATURES[@]}"; do
         # Loop over satellites
         for SATELLITE in "AQUA_MODIS" "TERRA_MODIS"; do
-	    echo "ULTIMO LOOP BANDD"
+	    #echo "ULTIMO LOOP BANDD"
             # Construct the filename
             FILE_NAME="${SATELLITE}.${START_DATE}_${END_DATE}.L3m.MO.${FEATURE}.${RESOLUTION}.nc"
             # Construct the URL
             URL="${BASE_URL}/${FILE_NAME}"
-	    echo "LA URL EN CUESTION A EXPLORAR ES ${URL}"
+	    #echo "LA URL EN CUESTION A EXPLORAR ES ${URL}"
             # Download the file if it doesn't already exist
             if [ ! -f "$FILE_NAME" ]; then
                 echo "Downloading $FILE_NAME..."

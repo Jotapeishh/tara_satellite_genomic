@@ -45,12 +45,9 @@ def format_cleanup(datetime_str):
     clean_date_str = datetime.strftime(date, '%Y%m')
     return clean_date_str
 
-md_srf = md[md['Depth level'] == 'SRF'].copy()
+md_srf = md.copy()
 
 md_srf['date'] = md_srf['datetime'].apply(format_cleanup)
-
-md_srf['Event.date.YYYYMM'] = md_srf['Event.date'].str[:7].str.replace('-', '')
-md_srf['Event.date.YYYYMM01'] = md_srf['Event.date'].str[:7].str.replace('-', '')+'01'
 
 satellite_features = [
     'CHL.chlor_a', 'FLH.nflh', 'FLH.ipar', 'IOP.adg_unc_443', 'IOP.adg_443',
@@ -103,7 +100,7 @@ start_time = time.time()
 for index, row in md_srf.iterrows():
     latitude = row['lat_cast']
     longitude = row['lon_cast']
-    date = row['Event.date.YYYYMM']
+    date = row['date']
     
     for feature in satellite_features:
         resolution = '9km'
@@ -146,5 +143,5 @@ print(satellite_data_avg.isna().sum())
 
 print(f"Tiempo de ejecución: {execution_time:.2f} segundos")
 
-output_path = os.path.join(output_dir, f'matrix_tara_chile_adj_grids_{str(n_adj_points).zfill(2)}.tsv')
+output_path = os.path.join(output_dir, f'matrix_tara_chile_adj_grids_{str(n_adj_points).zfill(2)}_all.tsv')
 satellite_data_avg.to_csv(output_path, sep='\t')

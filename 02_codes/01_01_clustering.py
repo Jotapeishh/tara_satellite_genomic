@@ -37,7 +37,7 @@ os.makedirs(output_dir, exist_ok=True)
 
 # Read matrices of interest and sort them alphabetically
 files = os.listdir(input_dir)
-matrix_files = sorted([f for f in files if f.startswith('Matrix_chile_GEN_') and f.endswith('.tsv')])
+matrix_files = sorted([f for f in files if f.startswith('Matrix_chile_GEN_') and f.endswith('_all.tsv')])
 print(f"Matrixes read and sorted. Total: {len(matrix_files)}")
 
 all_metrics_results = []
